@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Lection2_Core_29_09_API
+namespace Lection2_Core_DAL
 {
     [Index(nameof(Title), IsUnique = true)]
     public class Good

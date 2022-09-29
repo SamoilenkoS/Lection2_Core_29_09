@@ -1,4 +1,4 @@
-﻿namespace Lection2_Core_29_09_API
+﻿namespace Lection2_Core_DAL
 {
     public enum Category
     {

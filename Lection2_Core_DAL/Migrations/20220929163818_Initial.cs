@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Lection2_Core_BL.Migrations
+namespace Lection2_Core_DAL.Migrations
 {
     public partial class Initial : Migration
     {

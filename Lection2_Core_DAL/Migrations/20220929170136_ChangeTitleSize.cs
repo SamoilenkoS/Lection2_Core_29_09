@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Lection2_Core_BL.Migrations
+namespace Lection2_Core_DAL.Migrations
 {
     public partial class ChangeTitleSize : Migration
     {

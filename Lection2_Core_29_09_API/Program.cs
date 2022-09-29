@@ -1,5 +1,6 @@
 using Lection2_Core_BL;
 using Lection2_Core_BL.Profiles;
+using Lection2_Core_DAL;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
