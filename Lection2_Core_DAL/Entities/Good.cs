@@ -1,15 +1,12 @@
+using Lection2_Core_DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace Lection2_Core_DAL
 {
     [Index(nameof(Title), IsUnique = true)]
-    public class Good
+    public class Good : Entity
     {
-        [Key]
-        [JsonIgnore]
-        public Guid Id { get; set; }
         [Required]
         [StringLength(20, MinimumLength = 3)]
         public string? Title { get; set; }

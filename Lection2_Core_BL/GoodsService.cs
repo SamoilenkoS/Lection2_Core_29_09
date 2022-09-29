@@ -2,20 +2,19 @@
 using Lection2_Core_BL.DTOs;
 using Lection2_Core_DAL;
 using Lection2_Core_DAL.DTOs;
-using Microsoft.EntityFrameworkCore;
 
 namespace Lection2_Core_BL;
 
 public class GoodsService
 {
-    private readonly EfDbContext _dbContext;
+    private readonly GenericRepository<Good> _goodRepository;
     private readonly IMapper _mapper;
 
     public GoodsService(
-        EfDbContext dbContext,
+        GenericRepository<Good> goodRepository,
         IMapper mapper)
     {
-        _dbContext = dbContext;
+        _goodRepository = goodRepository;
         _mapper = mapper;
     }
 
@@ -24,39 +23,36 @@ public class GoodsService
         var good = _mapper.Map<Good>(createGoodDto);
         ValidateGood(good);
 
-        good.Id = Guid.NewGuid();
-        _dbContext.Goods.Add(good);
-
-        await _dbContext.SaveChangesAsync();
-
+        await _goodRepository.CreateAsync(good);
+        
         return _mapper.Map<GoodDto>(good);
     }
 
 
-    public async Task<Good?> GetByIdAsync(Guid id)
-        => await _dbContext.Goods.SingleOrDefaultAsync(x => x.Id == id);
+    //public async Task<Good?> GetByIdAsync(Guid id)
+    //    => await _dbContext.Goods.SingleOrDefaultAsync(x => x.Id == id);
 
     public async Task<IEnumerable<GoodDto>> GetAllAsync()
-        => _mapper.Map<IEnumerable<GoodDto>>(await _dbContext.Goods.ToListAsync());
+        => _mapper.Map<IEnumerable<GoodDto>>(await _goodRepository.GetAllAsync());
 
-    public async Task<Good> DeleteAsync(Guid id)
-    {
-        var good = new Good { Id = id };
-        _dbContext.Entry(good).State = EntityState.Deleted;
-        await _dbContext.SaveChangesAsync();
+    //public async Task<Good> DeleteAsync(Guid id)
+    //{
+    //    var good = new Good { Id = id };
+    //    _dbContext.Entry(good).State = EntityState.Deleted;
+    //    await _dbContext.SaveChangesAsync();
 
-        return good;
-    }
+    //    return good;
+    //}
 
-    public async Task<Good> UpdateAsync(Good good)
-    {
-        ValidateGood(good);
+    //public async Task<Good> UpdateAsync(Good good)
+    //{
+    //    ValidateGood(good);
 
-        _dbContext.Entry(good).State = EntityState.Modified;
-        await _dbContext.SaveChangesAsync();
+    //    _dbContext.Entry(good).State = EntityState.Modified;
+    //    await _dbContext.SaveChangesAsync();
 
-        return good;
-    }
+    //    return good;
+    //}
 
     private static void ValidateGood(Good good)
     {

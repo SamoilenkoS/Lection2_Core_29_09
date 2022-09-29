@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<EfDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddScoped<GoodsService>();
+builder.Services.AddScoped(typeof(GenericRepository<>));
 builder.Services.AddControllers();
 var assemblies = new[]
 {
