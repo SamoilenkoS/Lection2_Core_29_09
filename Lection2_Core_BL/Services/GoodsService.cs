@@ -8,16 +8,13 @@ namespace Lection2_Core_BL.Services;
 public class GoodsService
 {
     private readonly GenericRepository<Good> _goodRepository;
-    private readonly CalculationService _service;
     private readonly IMapper _mapper;
 
     public GoodsService(
         GenericRepository<Good> goodRepository,
-        CalculationService service,
         IMapper mapper)
     {
         _goodRepository = goodRepository;
-        _service = service;
         _mapper = mapper;
     }
 
@@ -36,8 +33,6 @@ public class GoodsService
 
     public async Task<IEnumerable<GoodDto>> GetAllAsync()
         => _mapper.Map<IEnumerable<GoodDto>>(await _goodRepository.GetAllAsync());
-
-    public int GetValue() => _service.Value;
 
     public async Task<GoodDto> DeleteAsync(Guid id)
         => _mapper.Map<GoodDto>(await _goodRepository.DeleteAsync(id));

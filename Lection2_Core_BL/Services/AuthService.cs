@@ -17,12 +17,14 @@ public class AuthService
         _userRepository = userRepository;
         _mapper = mapper;
     }
-    
-    public async Task RegisterAsync(RegistrationDto registrationDto)
+
+    public async Task<string> RegisterAsync(RegistrationDto registrationDto)
     {
         //validate
         //hash password
         await _userRepository.CreateAsync(_mapper.Map<User>(registrationDto));
+
+        return TokenService.GenerateToken(registrationDto.Email, new List<string> { "Admin", "User" });
         //save to db
         //return token;
     }

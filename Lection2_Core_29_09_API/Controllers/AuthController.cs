@@ -18,9 +18,7 @@ namespace Lection2_Core_API.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterAsync(RegistrationDto registrationDto)
         {
-            await _authService.RegisterAsync(registrationDto);
-
-            return Ok();
+            return Ok(await _authService.RegisterAsync(registrationDto));
         }
     }
 }

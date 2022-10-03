@@ -1,7 +1,10 @@
 using Lection2_Core_BL.Profiles;
 using Lection2_Core_BL.Services;
 using Lection2_Core_DAL;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +14,17 @@ builder.Services.AddDbContext<EfDbContext>(options =>
 builder.Services.AddScoped<GoodsService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped(typeof(GenericRepository<>));
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
+            builder.Configuration["AuthSettings:Key"]))
+    };
+});
 builder.Services.AddControllers();
 var assemblies = new[]
 {
@@ -33,6 +47,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
