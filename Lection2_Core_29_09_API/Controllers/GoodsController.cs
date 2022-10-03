@@ -1,5 +1,5 @@
-using Lection2_Core_BL;
 using Lection2_Core_BL.DTOs;
+using Lection2_Core_BL.Services;
 using Lection2_Core_DAL.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,9 +28,17 @@ public class GoodsController : ControllerBase
         return await _goodsService.GetAllAsync();
     }
 
-    //[HttpGet]
-    //public IEnumerable<Good> Get()
-    //{
-        
-    //}
+    [HttpGet("{id}")]
+    public async Task<GoodDto> GetByIdAsync(Guid id)
+    {
+        return await _goodsService.GetByIdAsync(id);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<GoodDto> DeleteAsync(Guid id)
+        => await _goodsService.DeleteAsync(id);
+
+    [HttpPut("{id}")]
+    public async Task<GoodDto> UpdateAsync(Guid id, CreateGoodDto createGoodDto)
+        => await _goodsService.UpdateAsync(id, createGoodDto);
 }

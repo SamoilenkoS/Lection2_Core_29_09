@@ -4,6 +4,7 @@ using Lection2_Core_DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lection2_Core_DAL.Migrations
 {
     [DbContext(typeof(EfDbContext))]
-    partial class EfDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221003181505_RolesSeed")]
+    partial class RolesSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,7 +39,7 @@ namespace Lection2_Core_DAL.Migrations
                     b.HasIndex("Title")
                         .IsUnique();
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -91,7 +93,7 @@ namespace Lection2_Core_DAL.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Lection2_Core_DAL.Entities.UserRoles", b =>
@@ -106,7 +108,7 @@ namespace Lection2_Core_DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRolesList", (string)null);
+                    b.ToTable("UserRolesList");
                 });
 
             modelBuilder.Entity("Lection2_Core_DAL.Good", b =>
@@ -134,7 +136,7 @@ namespace Lection2_Core_DAL.Migrations
                     b.HasIndex("Title")
                         .IsUnique();
 
-                    b.ToTable("Goods", (string)null);
+                    b.ToTable("Goods");
                 });
 
             modelBuilder.Entity("Lection2_Core_DAL.Entities.UserRoles", b =>

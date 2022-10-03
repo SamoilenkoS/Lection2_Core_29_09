@@ -3,18 +3,21 @@ using Lection2_Core_BL.DTOs;
 using Lection2_Core_DAL;
 using Lection2_Core_DAL.DTOs;
 
-namespace Lection2_Core_BL;
+namespace Lection2_Core_BL.Services;
 
 public class GoodsService
 {
     private readonly GenericRepository<Good> _goodRepository;
+    private readonly CalculationService _service;
     private readonly IMapper _mapper;
 
     public GoodsService(
         GenericRepository<Good> goodRepository,
+        CalculationService service,
         IMapper mapper)
     {
         _goodRepository = goodRepository;
+        _service = service;
         _mapper = mapper;
     }
 
@@ -24,35 +27,30 @@ public class GoodsService
         ValidateGood(good);
 
         await _goodRepository.CreateAsync(good);
-        
+
         return _mapper.Map<GoodDto>(good);
     }
 
-
-    //public async Task<Good?> GetByIdAsync(Guid id)
-    //    => await _dbContext.Goods.SingleOrDefaultAsync(x => x.Id == id);
+    public async Task<GoodDto> GetByIdAsync(Guid id)
+        => _mapper.Map<GoodDto>(await _goodRepository.GetByIdAsync(id));
 
     public async Task<IEnumerable<GoodDto>> GetAllAsync()
         => _mapper.Map<IEnumerable<GoodDto>>(await _goodRepository.GetAllAsync());
 
-    //public async Task<Good> DeleteAsync(Guid id)
-    //{
-    //    var good = new Good { Id = id };
-    //    _dbContext.Entry(good).State = EntityState.Deleted;
-    //    await _dbContext.SaveChangesAsync();
+    public int GetValue() => _service.Value;
 
-    //    return good;
-    //}
+    public async Task<GoodDto> DeleteAsync(Guid id)
+        => _mapper.Map<GoodDto>(await _goodRepository.DeleteAsync(id));
 
-    //public async Task<Good> UpdateAsync(Good good)
-    //{
-    //    ValidateGood(good);
+    public async Task<GoodDto> UpdateAsync(Guid id, CreateGoodDto createGoodDto)
+    {
+        var good = _mapper.Map<Good>(createGoodDto);
+        good.Id = id;
 
-    //    _dbContext.Entry(good).State = EntityState.Modified;
-    //    await _dbContext.SaveChangesAsync();
+        ValidateGood(good);
 
-    //    return good;
-    //}
+        return _mapper.Map<GoodDto>(await _goodRepository.UpdateAsync(good));
+    }
 
     private static void ValidateGood(Good good)
     {
@@ -63,5 +61,4 @@ public class GoodsService
                 $"{good.Price} is not valid for category {nameof(Category.Food)}");
         }
     }
-
 }
