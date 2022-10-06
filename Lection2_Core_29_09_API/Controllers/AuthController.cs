@@ -26,5 +26,11 @@ namespace Lection2_Core_API.Controllers
         {
             return Ok(await _authService.LoginAsync(credentialsDto));
         }
+
+        [HttpGet("confirmation")]
+        public async Task<IActionResult> ConfirmEmailAsync(string email, string key)
+        {
+            return Ok(await _authService.ConfirmEmailAsync(email, key));
+        }
     }
 }

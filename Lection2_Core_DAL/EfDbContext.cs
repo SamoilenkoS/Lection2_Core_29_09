@@ -9,6 +9,7 @@ public class EfDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<UserRoles> UserRolesList { get; set; }
+    public DbSet<EmailStatus> EmailStatuses { get; set; }
 
     public EfDbContext(DbContextOptions<EfDbContext> options)
         : base(options)

@@ -1,6 +1,7 @@
 using Lection2_Core_BL.Options;
 using Lection2_Core_BL.Profiles;
 using Lection2_Core_BL.Services;
+using Lection2_Core_BL.Services.SmtpService;
 using Lection2_Core_DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,9 @@ builder.Services.Configure<AuthOptions>(
     builder.Configuration.GetSection(nameof(AuthOptions)));
 builder.Services.Configure<HashingOptions>(
     builder.Configuration.GetSection(nameof(HashingOptions)));
+builder.Services.Configure<SmtpOptions>(
+    builder.Configuration.GetSection(nameof(SmtpOptions)));
+builder.Services.AddScoped<ISmtpService, MockSmtpService>();
 builder.Services.AddSingleton<HashService>();
 builder.Services.AddSingleton<TokenService>();
 
