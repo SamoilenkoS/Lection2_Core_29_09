@@ -1,5 +1,6 @@
 ﻿using Lection2_Core_DAL.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Lection2_Core_DAL
 {
@@ -44,6 +45,11 @@ namespace Lection2_Core_DAL
             await _dbContext.SaveChangesAsync();
 
             return entity;
+        }
+
+        public IQueryable<T> GetByPredicateAsync(Expression<Func<T, bool>> expression)
+        {
+            return _dbSet.Where(expression);
         }
     }
 }

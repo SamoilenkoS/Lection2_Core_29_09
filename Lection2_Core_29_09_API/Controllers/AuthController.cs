@@ -20,5 +20,11 @@ namespace Lection2_Core_API.Controllers
         {
             return Ok(await _authService.RegisterAsync(registrationDto));
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginAsync(CredentialsDto credentialsDto)
+        {
+            return Ok(await _authService.LoginAsync(credentialsDto));
+        }
     }
 }

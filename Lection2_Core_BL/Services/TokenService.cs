@@ -1,19 +1,22 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
+﻿using Lection2_Core_BL.Options;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Lection2_Core_BL.Services
 {
     public class TokenService
     {
-        private static string Secret = "ERMN05OPLoDvbTTa/QkqLNMI7cPLguaRyHzyg7n5qNBVjQmtBhz4SzYh4NBVCXi3KJHlSXKP+oi2+bXr6CUYTR==";
+        private readonly AuthOptions _authOptions;
 
-        public static string GenerateToken(string username, IEnumerable<string> userRoles)
+        public TokenService(IOptions<AuthOptions> authOptions)
+        {
+            _authOptions = authOptions.Value;
+        }
+
+        public string GenerateToken(string username, IEnumerable<string> userRoles)
         {
             var claims = userRoles
                 .Select(r => new Claim(ClaimTypes.Role, r))
@@ -23,8 +26,7 @@ namespace Lection2_Core_BL.Services
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey
-                        (Encoding.ASCII.GetBytes(Secret)),
+                    new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authOptions.Key)),
                     SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -32,8 +34,8 @@ namespace Lection2_Core_BL.Services
             JwtSecurityToken token = handler.CreateJwtSecurityToken(descriptor);
             return handler.WriteToken(token);
         }
-        
-        public static ClaimsPrincipal GetPrincipal(string token)
+
+        public ClaimsPrincipal GetPrincipal(string token)
         {
             try
             {
@@ -41,7 +43,7 @@ namespace Lection2_Core_BL.Services
                 JwtSecurityToken jwtToken = (JwtSecurityToken)tokenHandler.ReadToken(token);
                 if (jwtToken == null)
                     return null;
-                byte[] key = Convert.FromBase64String(Secret);
+                byte[] key = Convert.FromBase64String(_authOptions.Key);
                 TokenValidationParameters parameters = new TokenValidationParameters()
                 {
                     RequireExpirationTime = true,
@@ -59,9 +61,9 @@ namespace Lection2_Core_BL.Services
                 return null;
             }
         }
-        public static string ValidateToken(string token)
+
+        public string ValidateToken(string token)
         {
-            string username = null;
             ClaimsPrincipal principal = GetPrincipal(token);
             if (principal == null)
                 return null;
@@ -75,9 +77,8 @@ namespace Lection2_Core_BL.Services
                 return null;
             }
             Claim usernameClaim = identity.FindFirst(ClaimTypes.Name);
-            username = usernameClaim.Value;
+            string username = usernameClaim.Value;
             return username;
         }
-
     }
 }
