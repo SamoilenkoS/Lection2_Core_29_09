@@ -5,7 +5,6 @@ using Lection2_Core_DAL;
 using Lection2_Core_DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using System.Web;
 
 namespace Lection2_Core_BL.Services;
 
@@ -15,6 +14,8 @@ public class AuthService
     private readonly HashService _hashService;
     private readonly GenericRepository<User> _userRepository;
     private readonly GenericRepository<EmailStatus> _emailStatusRepository;
+    private readonly GenericRepository<Role> _rolesRepository;
+    private readonly BasicGenericRepository<UserRoles> _userRolesRepository;
     private readonly TokenService _tokenService;
     private readonly IMapper _mapper;
 
@@ -23,6 +24,8 @@ public class AuthService
         HashService hashService,
         GenericRepository<EmailStatus> emailStatusRepository,
         GenericRepository<User> userRepository,
+        GenericRepository<Role> rolesRepository,
+        BasicGenericRepository<UserRoles> userRolesRepository,
         TokenService tokenService,
         IMapper mapper)
     {
@@ -30,6 +33,8 @@ public class AuthService
         _hashService = hashService;
         _emailStatusRepository = emailStatusRepository;
         _userRepository = userRepository;
+        _rolesRepository = rolesRepository;
+        _userRolesRepository = userRolesRepository;
         _tokenService = tokenService;
         _mapper = mapper;
     }
@@ -39,17 +44,27 @@ public class AuthService
         var userWithRequiedKey = await _emailStatusRepository.GetByPredicateAsync(
             x => x.User!.Email == email && x.Key == key)
             .FirstOrDefaultAsync();
-        if(userWithRequiedKey != null)
+        if (userWithRequiedKey != null)
         {
             userWithRequiedKey.IsConfirmed = true;
             await _emailStatusRepository.UpdateAsync(userWithRequiedKey);
+            var roleId = await _rolesRepository.GetByPredicateAsync(x
+                => x.Title == RolesList.User)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
+            await _userRolesRepository.CreateAsync(new UserRoles
+            {
+                UserId = userWithRequiedKey.UserId,
+                RoleId = roleId
+            });
+
             return true;
         }
 
         return false;
     }
 
-    public async Task<string> RegisterAsync(
+    public async Task RegisterAsync(
         RegistrationDto registrationDto, UriBuilder uriBuilder)
     {
         var dto = _mapper.Map<User>(registrationDto);
@@ -67,31 +82,23 @@ public class AuthService
 
         await _smtpService.SendEmailAsync(dto.Email, "Email confirmation", uriBuilder.Uri.ToString());
 
-        return _tokenService.GenerateToken(registrationDto.Email, new List<string> { "Admin", "User" });
-    }
-
-    private static void AddQueryParamsToUri(UriBuilder uriBuilder, Dictionary<string, string> queryParams)
-    {
-        uriBuilder.Query = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={kvp.Value}"));
-    }
-
-    private static Dictionary<string, string> CreateQueryParams(string email, string emailKey)
-    {
-        var queryParams = new Dictionary<string, string>();
-        queryParams.Add("email", email);
-        queryParams.Add("key", emailKey);
-        return queryParams;
     }
 
     public async Task<string> LoginAsync(CredentialsDto credentialsDto)
     {
-        var user = await _userRepository.GetByPredicateAsync(
-            x => x.Email == credentialsDto.Login).FirstOrDefaultAsync();
-        if(user != null)
-        {
-            if(_hashService.VerifySameHash(credentialsDto.Password, user.Password))
+        var userWithRolesDto = await _userRepository.GetByPredicateAsync(
+            x => x.Email == credentialsDto.Login)
+            .Select(x => new UserWithRolesDto
             {
-                return _tokenService.GenerateToken(user.Email, new List<string> { "Admin", "User" });
+                User = x,
+                UserRoles = x.Roles.Select(x => x.Role.Title)
+            })
+            .FirstOrDefaultAsync();
+        if (userWithRolesDto != null)
+        {
+            if (_hashService.VerifySameHash(credentialsDto.Password, userWithRolesDto.User.Password))
+            {
+                return _tokenService.GenerateToken(userWithRolesDto.User.Email, userWithRolesDto.UserRoles);
             }
         }
 
@@ -111,4 +118,18 @@ public class AuthService
 
         return result.ToString();
     }
+
+    private static void AddQueryParamsToUri(UriBuilder uriBuilder, Dictionary<string, string> queryParams)
+    {
+        uriBuilder.Query = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+    }
+
+    private static Dictionary<string, string> CreateQueryParams(string email, string emailKey)
+    {
+        var queryParams = new Dictionary<string, string>();
+        queryParams.Add("email", email);
+        queryParams.Add("key", emailKey);
+        return queryParams;
+    }
+
 }

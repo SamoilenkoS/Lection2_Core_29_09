@@ -41,7 +41,7 @@ namespace Lection2_Core_DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EmailStatuses");
+                    b.ToTable("EmailStatuses", (string)null);
                 });
 
             modelBuilder.Entity("Lection2_Core_DAL.Entities.Role", b =>
@@ -59,7 +59,7 @@ namespace Lection2_Core_DAL.Migrations
                     b.HasIndex("Title")
                         .IsUnique();
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
 
                     b.HasData(
                         new
@@ -113,7 +113,7 @@ namespace Lection2_Core_DAL.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Lection2_Core_DAL.Entities.UserRoles", b =>
@@ -128,7 +128,7 @@ namespace Lection2_Core_DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRolesList");
+                    b.ToTable("UserRolesList", (string)null);
                 });
 
             modelBuilder.Entity("Lection2_Core_DAL.Good", b =>
@@ -156,7 +156,7 @@ namespace Lection2_Core_DAL.Migrations
                     b.HasIndex("Title")
                         .IsUnique();
 
-                    b.ToTable("Goods");
+                    b.ToTable("Goods", (string)null);
                 });
 
             modelBuilder.Entity("Lection2_Core_DAL.Entities.EmailStatus", b =>

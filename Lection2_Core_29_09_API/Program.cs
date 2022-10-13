@@ -16,6 +16,7 @@ builder.Services.AddDbContext<EfDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddScoped<GoodsService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped(typeof(BasicGenericRepository<>));
 builder.Services.AddScoped(typeof(GenericRepository<>));
 builder.Services.Configure<AuthOptions>(
     builder.Configuration.GetSection(nameof(AuthOptions)));

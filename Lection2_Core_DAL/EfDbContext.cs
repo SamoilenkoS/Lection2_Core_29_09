@@ -22,9 +22,9 @@ public class EfDbContext : DbContext
             .HasKey(nameof(UserRoles.UserId), nameof(UserRoles.RoleId));
 
         modelBuilder.Entity<Role>().HasData
-            (new Role { Id = Guid.Parse("9d25f40b-88de-4e7f-b76b-74f87f26f654"), Title = "Admin" });
-
+            (new Role { Id = Guid.Parse("9d25f40b-88de-4e7f-b76b-74f87f26f654"), Title = RolesList.Admin.ToString() });
+        
         modelBuilder.Entity<Role>().HasData
-            (new Role { Id = Guid.Parse("a2a9a6ba-cc43-4251-bfc9-34791264a417"), Title = "User" });
+            (new Role { Id = Guid.Parse("a2a9a6ba-cc43-4251-bfc9-34791264a417"), Title = RolesList.User.ToString() });
     }
 }

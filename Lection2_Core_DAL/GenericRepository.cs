@@ -1,31 +1,18 @@
 ﻿using Lection2_Core_DAL.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace Lection2_Core_DAL
 {
-    public class GenericRepository<T> where T : Entity, new()
+    public class GenericRepository<T> : BasicGenericRepository<T> where T : Entity, new()
     {
-        private readonly EfDbContext _dbContext;
-        private readonly DbSet<T> _dbSet;
+        public GenericRepository(EfDbContext dbContext) : base(dbContext)
+        {}
 
-        public GenericRepository(EfDbContext dbContext)
-        {
-            _dbContext = dbContext;
-            _dbSet = dbContext.Set<T>();
-        }
-
-        public async Task<T> CreateAsync(T entity)
+        public override async Task<T> CreateAsync(T entity)
         {
             entity.Id = Guid.NewGuid();
-            _dbSet.Add(entity);
-            await _dbContext.SaveChangesAsync();
-
-            return entity;
+            return await base.CreateAsync(entity);
         }
-
-        public async Task<IEnumerable<T>> GetAllAsync()
-            => await _dbSet.ToListAsync();
 
         public async Task<T> GetByIdAsync(Guid id)
             => await _dbSet.FindAsync(id);
@@ -47,14 +34,5 @@ namespace Lection2_Core_DAL
             return entity;
         }
 
-        public IQueryable<T> GetByPredicateAsync(Expression<Func<T, bool>> expression)
-        {
-            return _dbSet.Where(expression);
-        }
-
-        public IQueryable<T> GetByPredicateAsync(string navigationProperty, Expression<Func<T, bool>> expression)
-        {
-            return _dbSet.Include(navigationProperty).Where(expression);
-        }
     }
 }

@@ -25,7 +25,10 @@ public class AuthController : ControllerBase
             Request.Host.Host,
             Request.Host.Port!.Value,
             controller + "/" + ConfirmationRoute);
-        return Ok(await _authService.RegisterAsync(registrationDto, uriBuilder));
+
+        await _authService.RegisterAsync(registrationDto, uriBuilder);
+
+        return Ok();
     }
 
     [HttpPost("login")]
