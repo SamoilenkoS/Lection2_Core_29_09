@@ -4,6 +4,8 @@ using Lection2_Core_BL.Services.SmtpService;
 using Lection2_Core_DAL;
 using Lection2_Core_DAL.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Web;
 
 namespace Lection2_Core_BL.Services;
 
@@ -34,39 +36,51 @@ public class AuthService
 
     public async Task<bool> ConfirmEmailAsync(string email, string key)
     {
-        var user = await _userRepository.GetByPredicateAsync(x => x.Email == email)
+        var userWithRequiedKey = await _emailStatusRepository.GetByPredicateAsync(
+            x => x.User!.Email == email && x.Key == key)
             .FirstOrDefaultAsync();
-        if(user != null)
+        if(userWithRequiedKey != null)
         {
-            var emailStatus = await _emailStatusRepository.GetByPredicateAsync(x => x.UserId == user.Id)
-                .FirstOrDefaultAsync();
-            if(emailStatus.Key == key)
-            {
-                emailStatus.IsConfirmed = true;
-                await _emailStatusRepository.UpdateAsync(emailStatus);
-                return true;
-            }
+            userWithRequiedKey.IsConfirmed = true;
+            await _emailStatusRepository.UpdateAsync(userWithRequiedKey);
+            return true;
         }
 
         return false;
     }
 
-    public async Task<string> RegisterAsync(RegistrationDto registrationDto)
+    public async Task<string> RegisterAsync(
+        RegistrationDto registrationDto, UriBuilder uriBuilder)
     {
         var dto = _mapper.Map<User>(registrationDto);
         dto.Password = _hashService.GetHash(dto.Password);
         await _userRepository.CreateAsync(dto);
+        var emailKey = GetRandomString();
+        AddQueryParamsToUri(uriBuilder, CreateQueryParams(dto.Email, emailKey));
         await _emailStatusRepository.CreateAsync(
             new EmailStatus
-        {
-            UserId= dto.Id,
-            IsConfirmed = false,
-            Key = GetRandomString()
-        });
+            {
+                UserId = dto.Id,
+                IsConfirmed = false,
+                Key = emailKey
+            });
 
-        await _smtpService.SendEmailAsync(dto.Email, "Email confirmation", GetRandomString());
+        await _smtpService.SendEmailAsync(dto.Email, "Email confirmation", uriBuilder.Uri.ToString());
 
         return _tokenService.GenerateToken(registrationDto.Email, new List<string> { "Admin", "User" });
+    }
+
+    private static void AddQueryParamsToUri(UriBuilder uriBuilder, Dictionary<string, string> queryParams)
+    {
+        uriBuilder.Query = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+    }
+
+    private static Dictionary<string, string> CreateQueryParams(string email, string emailKey)
+    {
+        var queryParams = new Dictionary<string, string>();
+        queryParams.Add("email", email);
+        queryParams.Add("key", emailKey);
+        return queryParams;
     }
 
     public async Task<string> LoginAsync(CredentialsDto credentialsDto)
@@ -86,6 +100,15 @@ public class AuthService
 
     private static string GetRandomString()
     {
-        return "asdwdqeqwe!!ewe4$";
+        var random = new Random();
+        string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToLower();
+        var length = random.Next(10, 20);
+        var result = new StringBuilder(string.Empty, length);
+        for (int i = 0; i < length; i++)
+        {
+            result.Append(chars[random.Next(chars.Length)]);
+        }
+
+        return result.ToString();
     }
 }

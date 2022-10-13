@@ -2,35 +2,41 @@
 using Lection2_Core_BL.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Lection2_Core_API.Controllers
+namespace Lection2_Core_API.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class AuthController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class AuthController : ControllerBase
+    private const string ConfirmationRoute = "confirmation";
+    private readonly AuthService _authService;
+
+    public AuthController(AuthService authService)
     {
-        private readonly AuthService _authService;
+        _authService = authService;
+    }
 
-        public AuthController(AuthService authService)
-        {
-            _authService = authService;
-        }
+    [HttpPost("register")]
+    public async Task<IActionResult> RegisterAsync(RegistrationDto registrationDto)
+    {
+        var controller = Request.RouteValues["controller"]!.ToString();
+        var uriBuilder = new UriBuilder(
+            Request.Scheme,
+            Request.Host.Host,
+            Request.Host.Port!.Value,
+            controller + "/" + ConfirmationRoute);
+        return Ok(await _authService.RegisterAsync(registrationDto, uriBuilder));
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> RegisterAsync(RegistrationDto registrationDto)
-        {
-            return Ok(await _authService.RegisterAsync(registrationDto));
-        }
+    [HttpPost("login")]
+    public async Task<IActionResult> LoginAsync(CredentialsDto credentialsDto)
+    {
+        return Ok(await _authService.LoginAsync(credentialsDto));
+    }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync(CredentialsDto credentialsDto)
-        {
-            return Ok(await _authService.LoginAsync(credentialsDto));
-        }
-
-        [HttpGet("confirmation")]
-        public async Task<IActionResult> ConfirmEmailAsync(string email, string key)
-        {
-            return Ok(await _authService.ConfirmEmailAsync(email, key));
-        }
+    [HttpGet(ConfirmationRoute)]
+    public async Task<IActionResult> ConfirmEmailAsync(string email, string key)
+    {
+        return Ok(await _authService.ConfirmEmailAsync(email, key));
     }
 }

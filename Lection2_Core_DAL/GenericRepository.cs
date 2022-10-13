@@ -51,5 +51,10 @@ namespace Lection2_Core_DAL
         {
             return _dbSet.Where(expression);
         }
+
+        public IQueryable<T> GetByPredicateAsync(string navigationProperty, Expression<Func<T, bool>> expression)
+        {
+            return _dbSet.Include(navigationProperty).Where(expression);
+        }
     }
 }
