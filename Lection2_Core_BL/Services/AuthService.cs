@@ -17,6 +17,7 @@ public class AuthService
     private readonly GenericRepository<Role> _rolesRepository;
     private readonly BasicGenericRepository<UserRoles> _userRolesRepository;
     private readonly TokenService _tokenService;
+    private readonly RolesHelper _rolesHelper;
     private readonly IMapper _mapper;
 
     public AuthService(
@@ -27,6 +28,7 @@ public class AuthService
         GenericRepository<Role> rolesRepository,
         BasicGenericRepository<UserRoles> userRolesRepository,
         TokenService tokenService,
+        RolesHelper rolesHelper,
         IMapper mapper)
     {
         _smtpService = smtpService;
@@ -36,6 +38,7 @@ public class AuthService
         _rolesRepository = rolesRepository;
         _userRolesRepository = userRolesRepository;
         _tokenService = tokenService;
+        _rolesHelper = rolesHelper;
         _mapper = mapper;
     }
 
@@ -103,6 +106,16 @@ public class AuthService
         }
 
         return null;
+    }
+
+    public async Task<bool> RemoveRoleAsync(Guid userId, string role)
+    {
+        var roleId = _rolesHelper[role];
+        return await _userRolesRepository.DeleteAsync(new UserRoles
+        {
+            RoleId = roleId,
+            UserId = userId
+        });
     }
 
     private static string GetRandomString()

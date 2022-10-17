@@ -5,15 +5,19 @@ namespace Lection2_Core_DAL;
 
 public class EfDbContext : DbContext
 {
+    private readonly RolesHelper _rolesHelper;
     public DbSet<Good> Goods { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<UserRoles> UserRolesList { get; set; }
     public DbSet<EmailStatus> EmailStatuses { get; set; }
 
-    public EfDbContext(DbContextOptions<EfDbContext> options)
+    public EfDbContext(
+        DbContextOptions<EfDbContext> options,
+        RolesHelper rolesHelper)
         : base(options)
     {
+        _rolesHelper = rolesHelper;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -21,10 +25,10 @@ public class EfDbContext : DbContext
         modelBuilder.Entity<UserRoles>()
             .HasKey(nameof(UserRoles.UserId), nameof(UserRoles.RoleId));
 
-        modelBuilder.Entity<Role>().HasData
-            (new Role { Id = Guid.Parse("9d25f40b-88de-4e7f-b76b-74f87f26f654"), Title = RolesList.Admin.ToString() });
-        
-        modelBuilder.Entity<Role>().HasData
-            (new Role { Id = Guid.Parse("a2a9a6ba-cc43-4251-bfc9-34791264a417"), Title = RolesList.User.ToString() });
+        foreach (var role in new RolesList())
+        {
+            modelBuilder.Entity<Role>().HasData
+                (new Role { Id = _rolesHelper[role], Title = role });
+        }
     }
 }

@@ -27,5 +27,11 @@ namespace Lection2_Core_DAL
 
         public async Task<IEnumerable<T>> GetAllAsync()
             => await _dbSet.ToListAsync();
+
+        public async Task<bool> DeleteAsync(T entity)
+        {
+            _dbSet.Remove(entity);
+            return await _dbContext.SaveChangesAsync() != 0;
+        }
     }
 }

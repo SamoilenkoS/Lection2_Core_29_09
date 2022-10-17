@@ -16,6 +16,12 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> DeleteUserRoleAsync(Guid userId, string roleTitle)
+    {
+        return Ok(await _authService.RemoveRoleAsync(userId, roleTitle));
+    }
+
     [HttpPost("register")]
     public async Task<IActionResult> RegisterAsync(RegistrationDto registrationDto)
     {

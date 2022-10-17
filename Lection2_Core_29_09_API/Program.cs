@@ -27,6 +27,7 @@ builder.Services.Configure<SmtpOptions>(
 builder.Services.AddScoped<ISmtpService, MockSmtpService>();
 builder.Services.AddSingleton<HashService>();
 builder.Services.AddSingleton<TokenService>();
+builder.Services.AddSingleton<RolesHelper>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
