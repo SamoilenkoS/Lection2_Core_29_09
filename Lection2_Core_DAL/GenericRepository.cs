@@ -1,9 +1,9 @@
 ﻿using Lection2_Core_DAL.Entities;
+using Lection2_Core_DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
-
 namespace Lection2_Core_DAL
 {
-    public class GenericRepository<T> : BasicGenericRepository<T> where T : Entity, new()
+    public class GenericRepository<T> : BasicGenericRepository<T>, IGenericRepository<T> where T : Entity, new()
     {
         public GenericRepository(EfDbContext dbContext) : base(dbContext)
         {}
@@ -33,6 +33,5 @@ namespace Lection2_Core_DAL
 
             return entity;
         }
-
     }
 }

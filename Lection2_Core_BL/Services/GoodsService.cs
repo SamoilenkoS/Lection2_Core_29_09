@@ -2,16 +2,17 @@
 using Lection2_Core_BL.DTOs;
 using Lection2_Core_DAL;
 using Lection2_Core_DAL.DTOs;
+using Lection2_Core_DAL.Interfaces;
 
 namespace Lection2_Core_BL.Services;
 
 public class GoodsService
 {
-    private readonly GenericRepository<Good> _goodRepository;
+    private readonly IGenericRepository<Good> _goodRepository;
     private readonly IMapper _mapper;
 
     public GoodsService(
-        GenericRepository<Good> goodRepository,
+        IGenericRepository<Good> goodRepository,
         IMapper mapper)
     {
         _goodRepository = goodRepository;
@@ -23,16 +24,24 @@ public class GoodsService
         var good = _mapper.Map<Good>(createGoodDto);
         ValidateGood(good);
 
-        await _goodRepository.CreateAsync(good);
+        var response = await _goodRepository.CreateAsync(good);
 
-        return _mapper.Map<GoodDto>(good);
+        return _mapper.Map<GoodDto>(response);
     }
 
     public async Task<GoodDto> GetByIdAsync(Guid id)
-        => _mapper.Map<GoodDto>(await _goodRepository.GetByIdAsync(id));
+    {
+        var goodFromDb = await _goodRepository.GetByIdAsync(id);
+
+        return _mapper.Map<GoodDto>(goodFromDb);
+    }
 
     public async Task<IEnumerable<GoodDto>> GetAllAsync()
-        => _mapper.Map<IEnumerable<GoodDto>>(await _goodRepository.GetAllAsync());
+    {
+        var goodFromDb = await _goodRepository.GetAllAsync();
+
+        return _mapper.Map<IEnumerable<GoodDto>>(goodFromDb);
+    }
 
     public async Task<GoodDto> DeleteAsync(Guid id)
         => _mapper.Map<GoodDto>(await _goodRepository.DeleteAsync(id));
@@ -49,8 +58,9 @@ public class GoodsService
 
     private static void ValidateGood(Good good)
     {
-        if (good.Category == Category.Food &&
-            good.Price > 200)
+        good.Price = 55;
+        if (good.Price < 0 || (good.Category == Category.Food &&
+            good.Price > 200))
         {
             throw new ArgumentException(
                 $"{good.Price} is not valid for category {nameof(Category.Food)}");

@@ -4,8 +4,8 @@ using Lection2_Core_BL.Profiles;
 using Lection2_Core_BL.Services;
 using Lection2_Core_BL.Services.SmtpService;
 using Lection2_Core_DAL;
+using Lection2_Core_DAL.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -24,7 +24,7 @@ builder.Services.AddScoped<GoodsService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(typeof(BasicGenericRepository<>));
-builder.Services.AddScoped(typeof(GenericRepository<>));
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.Configure<AuthOptions>(
     builder.Configuration.GetSection(nameof(AuthOptions)));
 builder.Services.Configure<HashingOptions>(

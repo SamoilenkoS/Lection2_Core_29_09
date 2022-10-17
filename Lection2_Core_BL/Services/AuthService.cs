@@ -3,6 +3,7 @@ using Lection2_Core_BL.DTOs;
 using Lection2_Core_BL.Services.SmtpService;
 using Lection2_Core_DAL;
 using Lection2_Core_DAL.Entities;
+using Lection2_Core_DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
@@ -12,9 +13,9 @@ public class AuthService
 {
     private readonly ISmtpService _smtpService;
     private readonly HashService _hashService;
-    private readonly GenericRepository<User> _userRepository;
-    private readonly GenericRepository<EmailStatus> _emailStatusRepository;
-    private readonly GenericRepository<Role> _rolesRepository;
+    private readonly IGenericRepository<User> _userRepository;
+    private readonly IGenericRepository<EmailStatus> _emailStatusRepository;
+    private readonly IGenericRepository<Role> _rolesRepository;
     private readonly BasicGenericRepository<UserRoles> _userRolesRepository;
     private readonly TokenService _tokenService;
     private readonly RolesHelper _rolesHelper;
@@ -23,9 +24,9 @@ public class AuthService
     public AuthService(
         ISmtpService smtpService,
         HashService hashService,
-        GenericRepository<EmailStatus> emailStatusRepository,
-        GenericRepository<User> userRepository,
-        GenericRepository<Role> rolesRepository,
+        IGenericRepository<EmailStatus> emailStatusRepository,
+        IGenericRepository<User> userRepository,
+        IGenericRepository<Role> rolesRepository,
         BasicGenericRepository<UserRoles> userRolesRepository,
         TokenService tokenService,
         RolesHelper rolesHelper,

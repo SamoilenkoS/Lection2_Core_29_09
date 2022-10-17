@@ -1,7 +1,6 @@
 using Lection2_Core_BL.DTOs;
 using Lection2_Core_BL.Services;
 using Lection2_Core_DAL.DTOs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lection2_Core_API.Controllers;
