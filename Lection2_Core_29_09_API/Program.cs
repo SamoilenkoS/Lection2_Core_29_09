@@ -1,21 +1,28 @@
+using Lection2_Core_API.Middlewares;
 using Lection2_Core_BL.Options;
 using Lection2_Core_BL.Profiles;
 using Lection2_Core_BL.Services;
 using Lection2_Core_BL.Services.SmtpService;
 using Lection2_Core_DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, _, configuration) => configuration
+                .ReadFrom.Configuration(context.Configuration));
 
 // Add services to the container.
 builder.Services.AddDbContext<EfDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddScoped<GoodsService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(typeof(BasicGenericRepository<>));
 builder.Services.AddScoped(typeof(GenericRepository<>));
 builder.Services.Configure<AuthOptions>(
@@ -95,6 +102,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<CustomErrorHandlingMiddleware>();
 
 app.MapControllers();
 

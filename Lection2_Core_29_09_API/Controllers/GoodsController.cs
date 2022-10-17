@@ -10,23 +10,28 @@ namespace Lection2_Core_API.Controllers;
 [Route("[controller]")]
 public class GoodsController : ControllerBase
 {
+    private ILogger<GoodsController> _logger;
     private readonly GoodsService _goodsService;
 
-    public GoodsController(GoodsService goodsService)
+    public GoodsController(
+        GoodsService goodsService,
+        ILogger<GoodsController> logger)
     {
         _goodsService = goodsService;
+        _logger = logger;
     }
 
     [HttpPost]
     public async Task<GoodDto> CreateAsync(CreateGoodDto good)
     {
+        _logger.LogInformation("Creating good with params: {@good}", good);
         return await _goodsService.CreateAsync(good);
     }
 
-    [Authorize]
     [HttpGet]
     public async Task<IEnumerable<GoodDto>> GetAllAsync()
     {
+        _logger.LogWarning("Oops! Someone is trying to get all goods!");
         return await _goodsService.GetAllAsync();
     }
 
