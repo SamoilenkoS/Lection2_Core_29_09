@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Lection2_Core_BL.DTOs;
+using Lection2_Core_BL.Services.GeneratorService;
 using Lection2_Core_BL.Services.HashService;
+using Lection2_Core_BL.Services.QueryService;
 using Lection2_Core_BL.Services.SmtpService;
 using Lection2_Core_BL.Services.TokenService;
 using Lection2_Core_DAL.Entities;
@@ -20,6 +22,8 @@ public class AuthService
     private readonly IBasicGenericRepository<UserRoles> _userRolesRepository;
     private readonly ITokenService _tokenService;
     private readonly IRolesHelper _rolesHelper;
+    private readonly IQueryService _queryService;
+    private readonly IGeneratorService _generatorService;
     private readonly IMapper _mapper;
 
     public AuthService(
@@ -31,6 +35,8 @@ public class AuthService
         IBasicGenericRepository<UserRoles> userRolesRepository,
         ITokenService tokenService,
         IRolesHelper rolesHelper,
+        IQueryService queryService,
+        IGeneratorService generatorService,
         IMapper mapper)
     {
         _smtpService = smtpService;
@@ -41,6 +47,8 @@ public class AuthService
         _userRolesRepository = userRolesRepository;
         _tokenService = tokenService;
         _rolesHelper = rolesHelper;
+        _queryService = queryService;
+        _generatorService = generatorService;
         _mapper = mapper;
     }
 
@@ -75,8 +83,8 @@ public class AuthService
         var dto = _mapper.Map<User>(registrationDto);
         dto.Password = _hashService.GetHash(dto.Password);
         await _userRepository.CreateAsync(dto);
-        var emailKey = GetRandomString();
-        AddQueryParamsToUri(uriBuilder, CreateQueryParams(dto.Email, emailKey));
+        var emailKey = _generatorService.GetRandomString();
+        _queryService.AddQueryParamsToUri(uriBuilder, _queryService.CreateQueryParams(dto.Email, emailKey));
         await _emailStatusRepository.CreateAsync(
             new EmailStatus
             {
@@ -86,7 +94,6 @@ public class AuthService
             });
 
         await _smtpService.SendEmailAsync(dto.Email, "Email confirmation", uriBuilder.Uri.ToString());
-
     }
 
     public async Task<string> LoginAsync(CredentialsDto credentialsDto)
@@ -119,32 +126,4 @@ public class AuthService
             UserId = userId
         });
     }
-
-    private static string GetRandomString()
-    {
-        var random = new Random();
-        string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToLower();
-        var length = random.Next(10, 20);
-        var result = new StringBuilder(string.Empty, length);
-        for (int i = 0; i < length; i++)
-        {
-            result.Append(chars[random.Next(chars.Length)]);
-        }
-
-        return result.ToString();
-    }
-
-    private static void AddQueryParamsToUri(UriBuilder uriBuilder, Dictionary<string, string> queryParams)
-    {
-        uriBuilder.Query = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={kvp.Value}"));
-    }
-
-    private static Dictionary<string, string> CreateQueryParams(string email, string emailKey)
-    {
-        var queryParams = new Dictionary<string, string>();
-        queryParams.Add("email", email);
-        queryParams.Add("key", emailKey);
-        return queryParams;
-    }
-
 }

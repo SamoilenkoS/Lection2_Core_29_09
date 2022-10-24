@@ -2,7 +2,9 @@ using Lection2_Core_API.Middlewares;
 using Lection2_Core_BL.Options;
 using Lection2_Core_BL.Profiles;
 using Lection2_Core_BL.Services;
+using Lection2_Core_BL.Services.GeneratorService;
 using Lection2_Core_BL.Services.HashService;
+using Lection2_Core_BL.Services.QueryService;
 using Lection2_Core_BL.Services.SmtpService;
 using Lection2_Core_BL.Services.TokenService;
 using Lection2_Core_DAL;
@@ -22,6 +24,8 @@ builder.Host.UseSerilog((context, _, configuration) => configuration
 
 // Add services to the container.
 builder.Services.AddScoped<ISmtpService, MockSmtpService>();
+builder.Services.AddSingleton<IGeneratorService, GeneratorService>();
+builder.Services.AddSingleton<IQueryService, QueryService>();
 builder.Services.AddSingleton<IHashService, HashService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IRolesHelper, RolesHelper>();

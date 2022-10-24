@@ -1,8 +1,11 @@
 ﻿using AutoFixture;
 using AutoMapper;
 using FluentAssertions;
+using Lection2_Core_BL.DTOs;
 using Lection2_Core_BL.Services;
+using Lection2_Core_BL.Services.GeneratorService;
 using Lection2_Core_BL.Services.HashService;
+using Lection2_Core_BL.Services.QueryService;
 using Lection2_Core_BL.Services.SmtpService;
 using Lection2_Core_BL.Services.TokenService;
 using Lection2_Core_DAL.Entities;
@@ -28,6 +31,8 @@ namespace Lection2_Core_BL.Tests
         Mock<IBasicGenericRepository<UserRoles>> _userRolesRepository;
         Mock<ITokenService> _tokenService;
         Mock<IRolesHelper> _rolesHelper;
+        Mock<IQueryService> _queryService;
+        Mock<IGeneratorService> _generatorService;
         Mock<IMapper> _mapper;
         Fixture _fixture;
 
@@ -42,6 +47,8 @@ namespace Lection2_Core_BL.Tests
             _userRolesRepository = new Mock<IBasicGenericRepository<UserRoles>>();
             _tokenService = new Mock<ITokenService>();
             _rolesHelper = new Mock<IRolesHelper>();
+            _queryService = new Mock<IQueryService>();
+            _generatorService = new Mock<IGeneratorService>();
             _mapper = new Mock<IMapper>();
             _fixture = new Fixture();
         }
@@ -156,29 +163,55 @@ namespace Lection2_Core_BL.Tests
                 Times.Never);
         }
 
-        //private User GetUser()
-        //{
-        //    return new User
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        Email = _fixture.Create<string>(),
-        //        Password = _fixture.Create<string>(),
-        //        EmailStatusId = _fixture.Create<Guid>(),
-        //        EmailStatus = new EmailStatus
-        //        {
-        //            Id = _fixture.Create<Guid>(),
-        //            Name = _fixture.Create<string>()
-        //        }
-        //    };
-        //}
-        //}
+        [Test]
+        public async Task RegisterAsync_WhenValidInput_ShouldRegisterUser()
+        {
+            var authService = GetAuthService();
+            var registrationDto = _fixture.Create<RegistrationDto>();
+            var userFromMapper = _fixture.Build<User>().Without(x => x.Roles).Create();
+            var hashedPassword = _fixture.Create<string>();
+            var emailKey = _fixture.Create<string>();
+            var queryDictionary = _fixture.Create<Dictionary<string, string>>();
+            var uriBuilder = new UriBuilder();
+            _mapper.Setup(x => x.Map<User>(It.Is<RegistrationDto>(x => x.Email == registrationDto.Email)))
+                .Returns(userFromMapper)
+                .Verifiable();
+            _hashService.Setup(x => x.GetHash(userFromMapper.Password))
+                .Returns(hashedPassword)
+                .Verifiable();
+            _userRepository.Setup(x => x.CreateAsync(It.Is<User>(x => x.Id == userFromMapper.Id)))
+                .Verifiable();
+            _generatorService
+                .Setup(x => x.GetRandomString())
+                .Returns(emailKey)
+                .Verifiable();
+            _queryService.Setup(x => x.CreateQueryParams(userFromMapper.Email, emailKey))
+                .Returns(queryDictionary)
+                .Verifiable();
+            _queryService.Setup(x => x.AddQueryParamsToUri(uriBuilder, queryDictionary))
+                .Verifiable();
+            _emailStatusRepository.Setup(x => x.CreateAsync(It.Is<EmailStatus>(x => x.UserId == userFromMapper.Id && !x.IsConfirmed && x.Key == emailKey)))
+                .Verifiable();
+            _smtpService.Setup(x => x.SendEmailAsync(userFromMapper.Email, It.IsAny<string>(),
+                uriBuilder.Uri.ToString())).Verifiable();
+
+            await authService.RegisterAsync(registrationDto, uriBuilder);
+
+            _mapper.Verify();
+            _hashService.Verify();
+            _userRepository.Verify();
+            _generatorService.Verify();
+            _queryService.Verify();
+            _emailStatusRepository.Verify();
+            _smtpService.Verify();
+        }
 
         private AuthService GetAuthService()
         {
             return new AuthService(_smtpService.Object, _hashService.Object,
                 _emailStatusRepository.Object, _userRepository.Object,
                 _rolesRepository.Object, _userRolesRepository.Object, _tokenService.Object,
-                _rolesHelper.Object, _mapper.Object);
+                _rolesHelper.Object, _queryService.Object, _generatorService.Object, _mapper.Object);
         }
     }
 }

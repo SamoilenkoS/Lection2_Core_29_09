@@ -16,7 +16,7 @@ namespace Lection2_Core_BL.Services.SmtpService
 
         public async Task SendEmailAsync(string email, string subject, string messageText)
         {
-            var SmtpServer = new SmtpClient
+            using var SmtpServer = new SmtpClient
             {
                 UseDefaultCredentials = false,
                 Host = _smtpOptions.Host,
@@ -30,7 +30,7 @@ namespace Lection2_Core_BL.Services.SmtpService
 
             var fromMessage = new MailAddress(_smtpOptions.Email);
             var toMessage = new MailAddress("iteacore@ukr.net");
-            var message = new MailMessage
+            using var message = new MailMessage
             {
                 From = fromMessage,
                 Subject = subject,
