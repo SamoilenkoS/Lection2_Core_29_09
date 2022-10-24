@@ -20,5 +20,5 @@ public class User : Entity
     public DateTime CreatedAt { get; set; }
     public bool IsBlocked { get; set; }
     public bool IsDeleted { get; set; }
-    public ICollection<UserRoles>? Roles { get; set; }
+    public IEnumerable<UserRoles>? Roles { get; set; }
 }

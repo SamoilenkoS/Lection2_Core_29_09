@@ -5,9 +5,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Lection2_Core_BL.Services
+namespace Lection2_Core_BL.Services.TokenService
 {
-    public class TokenService
+    public class TokenService : ITokenService
     {
         private readonly AuthOptions _authOptions;
 

@@ -1,8 +1,8 @@
 ﻿using Lection2_Core_DAL.Entities;
 
-namespace Lection2_Core_DAL
+namespace Lection2_Core_DAL.RolesHelper
 {
-    public class RolesHelper
+    public class RolesHelper : IRolesHelper
     {
         private Dictionary<string, Guid> _roles;
 

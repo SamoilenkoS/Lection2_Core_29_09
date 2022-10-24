@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Lection2_Core_DAL.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Lection2_Core_DAL
 {
-    public class BasicGenericRepository<T> where T : class, new()
+    public class BasicGenericRepository<T> : IBasicGenericRepository<T> where T : class, new()
     {
         protected readonly EfDbContext _dbContext;
         protected readonly DbSet<T> _dbSet;
@@ -22,7 +23,7 @@ namespace Lection2_Core_DAL
             return entity;
         }
 
-        public IQueryable<T> GetByPredicateAsync(Expression<Func<T, bool>> expression)
+        public IQueryable<T> GetByPredicate(Expression<Func<T, bool>> expression)
             => _dbSet.Where(expression);
 
         public async Task<IEnumerable<T>> GetAllAsync()

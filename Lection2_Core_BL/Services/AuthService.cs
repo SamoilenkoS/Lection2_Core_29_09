@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Lection2_Core_BL.DTOs;
+using Lection2_Core_BL.Services.HashService;
 using Lection2_Core_BL.Services.SmtpService;
-using Lection2_Core_DAL;
+using Lection2_Core_BL.Services.TokenService;
 using Lection2_Core_DAL.Entities;
 using Lection2_Core_DAL.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Lection2_Core_DAL.RolesHelper;
 using System.Text;
 
 namespace Lection2_Core_BL.Services;
@@ -12,24 +13,24 @@ namespace Lection2_Core_BL.Services;
 public class AuthService
 {
     private readonly ISmtpService _smtpService;
-    private readonly HashService _hashService;
+    private readonly IHashService _hashService;
     private readonly IGenericRepository<User> _userRepository;
     private readonly IGenericRepository<EmailStatus> _emailStatusRepository;
     private readonly IGenericRepository<Role> _rolesRepository;
-    private readonly BasicGenericRepository<UserRoles> _userRolesRepository;
-    private readonly TokenService _tokenService;
-    private readonly RolesHelper _rolesHelper;
+    private readonly IBasicGenericRepository<UserRoles> _userRolesRepository;
+    private readonly ITokenService _tokenService;
+    private readonly IRolesHelper _rolesHelper;
     private readonly IMapper _mapper;
 
     public AuthService(
         ISmtpService smtpService,
-        HashService hashService,
+        IHashService hashService,
         IGenericRepository<EmailStatus> emailStatusRepository,
         IGenericRepository<User> userRepository,
         IGenericRepository<Role> rolesRepository,
-        BasicGenericRepository<UserRoles> userRolesRepository,
-        TokenService tokenService,
-        RolesHelper rolesHelper,
+        IBasicGenericRepository<UserRoles> userRolesRepository,
+        ITokenService tokenService,
+        IRolesHelper rolesHelper,
         IMapper mapper)
     {
         _smtpService = smtpService;
@@ -45,17 +46,17 @@ public class AuthService
 
     public async Task<bool> ConfirmEmailAsync(string email, string key)
     {
-        var userWithRequiedKey = await _emailStatusRepository.GetByPredicateAsync(
+        var userWithRequiedKey = _emailStatusRepository.GetByPredicate(
             x => x.User!.Email == email && x.Key == key)
-            .FirstOrDefaultAsync();
+            .FirstOrDefault();
         if (userWithRequiedKey != null)
         {
             userWithRequiedKey.IsConfirmed = true;
             await _emailStatusRepository.UpdateAsync(userWithRequiedKey);
-            var roleId = await _rolesRepository.GetByPredicateAsync(x
+            var roleId = _rolesRepository.GetByPredicate(x
                 => x.Title == RolesList.User)
                 .Select(x => x.Id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
             await _userRolesRepository.CreateAsync(new UserRoles
             {
                 UserId = userWithRequiedKey.UserId,
@@ -90,14 +91,14 @@ public class AuthService
 
     public async Task<string> LoginAsync(CredentialsDto credentialsDto)
     {
-        var userWithRolesDto = await _userRepository.GetByPredicateAsync(
-            x => x.Email == credentialsDto.Login)
-            .Select(x => new UserWithRolesDto
+        var part1 = _userRepository.GetByPredicate(
+            x => x.Email == credentialsDto.Login);
+        var userWithRolesDto = part1.Select(x => new UserWithRolesDto
             {
                 User = x,
                 UserRoles = x.Roles.Select(x => x.Role.Title)
             })
-            .FirstOrDefaultAsync();
+            .FirstOrDefault();
         if (userWithRolesDto != null)
         {
             if (_hashService.VerifySameHash(credentialsDto.Password, userWithRolesDto.User.Password))

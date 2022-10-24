@@ -2,9 +2,12 @@ using Lection2_Core_API.Middlewares;
 using Lection2_Core_BL.Options;
 using Lection2_Core_BL.Profiles;
 using Lection2_Core_BL.Services;
+using Lection2_Core_BL.Services.HashService;
 using Lection2_Core_BL.Services.SmtpService;
+using Lection2_Core_BL.Services.TokenService;
 using Lection2_Core_DAL;
 using Lection2_Core_DAL.Interfaces;
+using Lection2_Core_DAL.RolesHelper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -18,12 +21,16 @@ builder.Host.UseSerilog((context, _, configuration) => configuration
                 .ReadFrom.Configuration(context.Configuration));
 
 // Add services to the container.
+builder.Services.AddScoped<ISmtpService, MockSmtpService>();
+builder.Services.AddSingleton<IHashService, HashService>();
+builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddSingleton<IRolesHelper, RolesHelper>();
 builder.Services.AddDbContext<EfDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddScoped<GoodsService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped(typeof(BasicGenericRepository<>));
+builder.Services.AddScoped(typeof(IBasicGenericRepository<>), typeof(BasicGenericRepository<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.Configure<AuthOptions>(
     builder.Configuration.GetSection(nameof(AuthOptions)));
@@ -31,10 +38,7 @@ builder.Services.Configure<HashingOptions>(
     builder.Configuration.GetSection(nameof(HashingOptions)));
 builder.Services.Configure<SmtpOptions>(
     builder.Configuration.GetSection(nameof(SmtpOptions)));
-builder.Services.AddScoped<ISmtpService, MockSmtpService>();
-builder.Services.AddSingleton<HashService>();
-builder.Services.AddSingleton<TokenService>();
-builder.Services.AddSingleton<RolesHelper>();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

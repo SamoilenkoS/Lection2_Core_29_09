@@ -10,6 +10,6 @@ namespace Lection2_Core_DAL.Interfaces
         Task<T> DeleteAsync(Guid id);
         Task<T> UpdateAsync(T entity);
         Task<IEnumerable<T>> GetAllAsync();
-        IQueryable<T> GetByPredicateAsync(Expression<Func<T, bool>> expression);
+        IQueryable<T> GetByPredicate(Expression<Func<T, bool>> expression);
     }
 }

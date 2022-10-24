@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Extensions.Options;
 
-namespace Lection2_Core_BL.Services
+namespace Lection2_Core_BL.Services.HashService
 {
-    public class HashService
+    public class HashService : IHashService
     {
         private readonly HashingOptions _hashingOptions;
 
