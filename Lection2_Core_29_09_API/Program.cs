@@ -1,3 +1,4 @@
+using Lection2_Core_API;
 using Lection2_Core_API.Middlewares;
 using Lection2_Core_BL.Options;
 using Lection2_Core_BL.Profiles;
@@ -11,6 +12,7 @@ using Lection2_Core_DAL;
 using Lection2_Core_DAL.Interfaces;
 using Lection2_Core_DAL.RolesHelper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -42,7 +44,10 @@ builder.Services.Configure<HashingOptions>(
     builder.Configuration.GetSection(nameof(HashingOptions)));
 builder.Services.Configure<SmtpOptions>(
     builder.Configuration.GetSection(nameof(SmtpOptions)));
-
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IUserIdProvider, AppUser>();
+builder.Services.AddSingleton<ConnectionsStorage>();
+builder.Services.AddSingleton<MessageStorage>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -112,6 +117,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<CustomErrorHandlingMiddleware>();
+
+app.MapHub<SignalRHub>("/chat");
 
 app.MapControllers();
 

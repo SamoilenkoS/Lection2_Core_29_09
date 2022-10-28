@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Lection2_Core.Core\Lection2_Core.Core.csproj" />
     <ProjectReference Include="..\Lection2_Core_BL\Lection2_Core_BL.csproj" />
   </ItemGroup>
 

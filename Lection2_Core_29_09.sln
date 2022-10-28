@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lection2_Core_BL", "Lection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lection2_Core_DAL", "Lection2_Core_DAL\Lection2_Core_DAL.csproj", "{66B07193-9772-459B-88DB-6E6440F40D1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lection2_Core_BL.Tests", "Lection_2_Core_BL.Tests\Lection2_Core_BL.Tests.csproj", "{3FBAF3CA-D13E-44EB-A9EF-B0B8FAF0072B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lection2_Core_BL.Tests", "Lection_2_Core_BL.Tests\Lection2_Core_BL.Tests.csproj", "{3FBAF3CA-D13E-44EB-A9EF-B0B8FAF0072B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lection2_Core.Core", "Lection2_Core.Core\Lection2_Core.Core.csproj", "{64C64B15-C9FA-408D-89B7-AC815766FCDC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{3FBAF3CA-D13E-44EB-A9EF-B0B8FAF0072B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FBAF3CA-D13E-44EB-A9EF-B0B8FAF0072B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FBAF3CA-D13E-44EB-A9EF-B0B8FAF0072B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64C64B15-C9FA-408D-89B7-AC815766FCDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64C64B15-C9FA-408D-89B7-AC815766FCDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64C64B15-C9FA-408D-89B7-AC815766FCDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64C64B15-C9FA-408D-89B7-AC815766FCDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
