@@ -1,19 +1,42 @@
-﻿using System.Collections.Concurrent;
+﻿using Lection2_Core.Core;
+using System.Collections.Concurrent;
 
 namespace Lection2_Core_API
 {
     public class ConnectionsStorage
     {
-        private readonly ConcurrentDictionary<string, string> _connections = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentDictionary<string, PublicUserInfo> _connections = 
+            new ConcurrentDictionary<string, PublicUserInfo>();
 
-        public string? GetUserId(string connectionId)
+        //TODO Add nickname update
+        public string? GetUserNickname(string connectionId)
         {
-            return _connections.TryGetValue(connectionId, out var userId) ? userId : null;
+             return _connections.TryGetValue(connectionId, out var userInfo)
+                ? userInfo.Nickname : null;
+        }
+
+        public PublicUserInfo? GetPublicUserInfo(string connectionId)
+        {
+            return _connections.TryGetValue(connectionId, out var userInfo)
+                ? userInfo : null;
         }
         
-        public bool Add(string connectionId, string userId)
+        public bool TryAddOrUpdate(string connectionId, PublicUserInfo publicUserInfo)
         {
-            return _connections.TryAdd(connectionId, userId);
+            if (!_connections.TryAdd(connectionId, publicUserInfo))
+            {
+                var value = _connections[connectionId];
+                return _connections.TryUpdate(
+                connectionId,
+                new PublicUserInfo
+                {
+                    Color = value.Color,
+                    Nickname = publicUserInfo.Nickname
+                },
+                _connections[connectionId]);
+            }
+
+            return true;
         }
 
         public void Remove(string connectionId)
@@ -23,7 +46,12 @@ namespace Lection2_Core_API
         
         public string GetConnectionId(string nickname)
         {
-            return _connections.FirstOrDefault(x => x.Value == nickname).Key;
+            return _connections.FirstOrDefault(x => x.Value.Nickname == nickname).Key;
+        }
+
+        public void SetPersonalColor(string connectionId, ConsoleColor consoleColor)
+        {
+            _connections[connectionId].Color = consoleColor;
         }
     }
 }

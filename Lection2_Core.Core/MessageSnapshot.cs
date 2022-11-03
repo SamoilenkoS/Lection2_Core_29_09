@@ -2,9 +2,9 @@
 {
     public class MessageSnapshot
     {
-        public string SenderId { get; set; }
+        public PublicUserInfo SenderUserInfo { get; set; }
         public string Message { get; set; }
         public bool IsPersonal { get; set; }
-        public string? ReceiverId { get; set; }
+        public string? ReceiverNickname { get; set; }
     }
 }

@@ -18,10 +18,15 @@ namespace Lection2_Core_API
             _messages.Push(message);
         }
 
-        public IEnumerable<MessageSnapshot> GetRecent(int count = DefaultSize)
+        public IEnumerable<MessageSnapshot> GetRecent(
+            string callerNickname,
+            int count = DefaultSize)
         {
-            var arr = _messages.ToArray();
-            return arr.Skip(arr.Length - DefaultSize).Take(DefaultSize);
+            var arr = _messages.Where(x =>
+                !x.IsPersonal ||//global messages
+                x.ReceiverNickname == callerNickname ||//to me from someone
+                x.SenderUserInfo.Nickname == callerNickname).ToArray();//my messages
+            return arr.Take(count).Reverse();
         }
     }
 }

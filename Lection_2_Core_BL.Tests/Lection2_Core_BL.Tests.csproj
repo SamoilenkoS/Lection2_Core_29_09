@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Lection2_Core_29_09_API\Lection2_Core_29_09_API.csproj" />
     <ProjectReference Include="..\Lection2_Core_BL\Lection2_Core_BL.csproj" />
   </ItemGroup>
 

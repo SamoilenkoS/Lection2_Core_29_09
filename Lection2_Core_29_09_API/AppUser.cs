@@ -13,7 +13,7 @@ namespace Lection2_Core_API
 
         public string? GetUserId(HubConnectionContext connection)
         {
-            return _connectionsStorage.GetUserId(connection.ConnectionId)
+            return _connectionsStorage.GetUserNickname(connection.ConnectionId)
                 ?? connection.ConnectionId;
         }
 
