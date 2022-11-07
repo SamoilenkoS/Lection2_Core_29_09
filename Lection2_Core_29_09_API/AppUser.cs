@@ -4,9 +4,9 @@ namespace Lection2_Core_API
 {
     public class AppUser : IUserIdProvider
     {
-        private readonly ConnectionsStorage _connectionsStorage;
+        private readonly IConnectionsStorage _connectionsStorage;
 
-        public AppUser(ConnectionsStorage connectionsStorage)
+        public AppUser(IConnectionsStorage connectionsStorage)
         {
             _connectionsStorage = connectionsStorage;
         }

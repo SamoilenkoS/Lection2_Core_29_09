@@ -10,9 +10,12 @@
     <PackageReference Include="AutoMapper" Version="11.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="6.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
+    <PackageReference Include="Quartz" Version="3.5.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Lection2_Core.Core\Lection2_Core.Core.csproj" />
     <ProjectReference Include="..\Lection2_Core_DAL\Lection2_Core_DAL.csproj" />
   </ItemGroup>
 

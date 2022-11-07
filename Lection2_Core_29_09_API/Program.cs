@@ -1,5 +1,6 @@
 using Lection2_Core_API;
 using Lection2_Core_API.Middlewares;
+using Lection2_Core_BL;
 using Lection2_Core_BL.Options;
 using Lection2_Core_BL.Profiles;
 using Lection2_Core_BL.Services;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using Serilog;
 using System.Text;
 
@@ -101,6 +103,24 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+builder.Services.AddQuartz(x =>
+{
+    x.UseMicrosoftDependencyInjectionJobFactory();
+    x.UsePersistentStore(q =>
+    {
+        q.UseSqlServer(sqlServer =>
+        {
+            sqlServer.ConnectionString = builder.Configuration.GetConnectionString("Default");
+            sqlServer.TablePrefix = "QRTZ_";
+        });
+        q.UseJsonSerializer();
+    });
+});
+builder.Services.AddQuartzServer(options =>
+ {
+     // when shutting down we want jobs to complete gracefully
+     options.WaitForJobsToComplete = true;
+ });
 
 var app = builder.Build();
 
