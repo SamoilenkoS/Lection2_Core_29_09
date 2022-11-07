@@ -2,14 +2,14 @@
 using Lection2_Core_API;
 using Microsoft.AspNetCore.SignalR;
 
-internal class SignalRHub : Hub<ISignalRClient>, ISignalRServer
+public class SignalRHub : Hub<ISignalRClient>, ISignalRServer
 {
-    private readonly ConnectionsStorage _connectionsStorage;
-    private readonly MessageStorage _messageStorage;
+    private readonly IConnectionsStorage _connectionsStorage;
+    private readonly IMessageStorage _messageStorage;
 
     public SignalRHub(
-        ConnectionsStorage connectionsStorage,
-        MessageStorage messageStorage)
+        IConnectionsStorage connectionsStorage,
+        IMessageStorage messageStorage)
     {
         _connectionsStorage = connectionsStorage;
         _messageStorage = messageStorage;
@@ -39,7 +39,7 @@ internal class SignalRHub : Hub<ISignalRClient>, ISignalRServer
                 SenderUserInfo = senderUserInfo!
             };
             await Clients.Others.GetMessage(messageSnapshot);
-            
+
             _messageStorage.Add(messageSnapshot);
         }
     }

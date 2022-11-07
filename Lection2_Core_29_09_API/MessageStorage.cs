@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace Lection2_Core_API
 {
-    public class MessageStorage
+    public class MessageStorage : IMessageStorage
     {
         private const int DefaultSize = 50;
         private readonly ConcurrentStack<MessageSnapshot> _messages;

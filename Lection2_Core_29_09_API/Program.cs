@@ -46,8 +46,8 @@ builder.Services.Configure<SmtpOptions>(
     builder.Configuration.GetSection(nameof(SmtpOptions)));
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IUserIdProvider, AppUser>();
-builder.Services.AddSingleton<ConnectionsStorage>();
-builder.Services.AddSingleton<MessageStorage>();
+builder.Services.AddSingleton<IConnectionsStorage, ConnectionsStorage>();
+builder.Services.AddSingleton<IMessageStorage, MessageStorage>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
