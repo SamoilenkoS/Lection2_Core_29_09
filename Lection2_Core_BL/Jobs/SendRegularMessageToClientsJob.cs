@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lection2_Core_BL
+namespace Lection2_Core_BL.Jobs
 {
     public class SendRegularMessageToClientsJob : IJob
     {
         private readonly IHubContext<SignalRHub> _hubContext;
-        
+
         public SendRegularMessageToClientsJob(IHubContext<SignalRHub> hubContext)
         {
             _hubContext = hubContext;
