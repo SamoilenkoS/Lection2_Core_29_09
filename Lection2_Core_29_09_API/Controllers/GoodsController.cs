@@ -1,6 +1,7 @@
 using Lection2_Core_BL.DTOs;
 using Lection2_Core_BL.Services;
 using Lection2_Core_DAL.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lection2_Core_API.Controllers;
@@ -40,6 +41,7 @@ public class GoodsController : ControllerBase
         return await _goodsService.GetByIdAsync(id);
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<GoodDto> DeleteAsync(Guid id)
         => await _goodsService.DeleteAsync(id);

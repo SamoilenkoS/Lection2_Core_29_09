@@ -50,6 +50,11 @@ builder.Services.AddSignalR();
 builder.Services.AddSingleton<IUserIdProvider, AppUser>();
 builder.Services.AddSingleton<IConnectionsStorage, ConnectionsStorage>();
 builder.Services.AddSingleton<IMessageStorage, MessageStorage>();
+builder.Services.AddCors(x =>
+    x.AddDefaultPolicy(x => x
+        .AllowAnyHeader()
+        .AllowAnyOrigin()
+        .AllowAnyMethod()));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -124,6 +129,7 @@ builder.Services.AddQuartzServer(options =>
 
 var app = builder.Build();
 
+app.UseCors();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
