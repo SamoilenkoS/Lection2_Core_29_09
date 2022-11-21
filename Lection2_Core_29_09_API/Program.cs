@@ -19,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Quartz;
 using Serilog;
+using StackExchange.Redis;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -121,6 +122,9 @@ builder.Services.AddQuartz(x =>
         q.UseJsonSerializer();
     });
 });
+builder.Services.AddScoped<CachingService>();
+builder.Services.AddScoped<IConnectionMultiplexer>(
+        x => ConnectionMultiplexer.Connect("localhost:5002"));
 builder.Services.AddQuartzServer(options =>
  {
      // when shutting down we want jobs to complete gracefully

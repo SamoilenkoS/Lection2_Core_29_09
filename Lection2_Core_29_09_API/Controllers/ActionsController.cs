@@ -1,4 +1,5 @@
-﻿using Lection2_Core_DAL.Entities;
+﻿using Lection2_Core_BL.Services;
+using Lection2_Core_DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +9,18 @@ namespace Lection2_Core_API.Controllers;
 [Route("[controller]")]
 public class ActionsController : ControllerBase
 {
-    [HttpGet(nameof(Unauthorized))]
-    public IActionResult Unauthorized()
+    private readonly CachingService _cashingService;
+
+    public ActionsController(CachingService cashingService)
     {
+        _cashingService = cashingService;
+    }
+
+    [HttpGet(nameof(Unauthorized))]
+    public async Task<IActionResult> Unauthorized()
+    {
+        var value = await _cashingService.GetAsync("3");
+        await _cashingService.SaveAsync("10", "50");
         return Ok();
     }
 
